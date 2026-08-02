@@ -483,6 +483,13 @@
   const DB_PATH = "UsersAccountData";
 
   function getTelegramUserId(){
+    // Prefer the explicit query param (matches how the bot's "My Account"
+    // button opens this page: ...?id=<telegram_user_id>) since it works
+    // immediately and doesn't depend on Telegram's initData being populated.
+    const params = new URLSearchParams(window.location.search);
+    if(params.get("id")) return params.get("id");
+    if(params.get("uid")) return params.get("uid");
+
     try{
       const tg = window.Telegram && window.Telegram.WebApp;
       if(tg){
@@ -492,8 +499,7 @@
         if(u && u.id) return String(u.id);
       }
     }catch(e){}
-    const params = new URLSearchParams(window.location.search);
-    if(params.get("uid")) return params.get("uid");
+
     return null;
   }
 
