@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>My Account</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#070a13;
+    --card-border:#1b2436;
+    --text-hi:#f3f6ff;
+    --text-mid:#9aa5bd;
+    --text-low:#5d6a86;
+    --purple:#8b5cf6;
+    --cyan:#38bdf8;
+    --green:#22e08a;
+    --green-dim:#0e3a2a;
+    --orange:#f5a524;
+    --orange-dim:#3a2c0e;
+    --red:#ff5470;
+    --red-dim:#3a1420;
+    --blue:#3b82f6;
+    --blue-dim:#132038;
+    --purple-dim:#241a3a;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+
+  html,body{
+    height:100%;
+    background:
+      radial-gradient(60% 40% at 20% -5%, rgba(139,92,246,0.25), transparent 60%),
+      radial-gradient(50% 35% at 100% 0%, rgba(56,189,248,0.18), transparent 60%),
+      var(--bg-0);
+    color:var(--text-hi);
+    font-family:'Manrope', system-ui, sans-serif;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  body{
+    display:flex;
+    justify-content:center;
+    padding:max(28px, env(safe-area-inset-top)) 16px max(40px, env(safe-area-inset-bottom));
+    min-height:100%;
+  }
+
+  .app{
+    width:100%;
+    max-width:460px;
+    position:relative;
+  }
+
+  svg{ display:block; }
+
+  /* ---------- LOADING ---------- */
+  #loading{
+    position:fixed;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:26px;
+    background:
+      radial-gradient(60% 40% at 20% -5%, rgba(139,92,246,0.25), transparent 60%),
+      radial-gradient(50% 35% at 100% 0%, rgba(56,189,248,0.18), transparent 60%),
+      var(--bg-0);
+    z-index:50;
+    transition:opacity .5s ease, visibility .5s ease;
+  }
+  #loading.hide{ opacity:0; visibility:hidden; pointer-events:none; }
+
+  .load-mark{
+    width:76px; height:76px;
+    border-radius:22px;
+    background:linear-gradient(135deg, var(--purple), var(--cyan));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 40px rgba(139,92,246,0.4);
+    position:relative;
+  }
+  .load-mark svg{ width:34px; height:34px; color:#fff; }
+  .load-mark::after{
+    content:"";
+    position:absolute; inset:-8px;
+    border-radius:28px;
+    border:2px solid rgba(139,92,246,0.35);
+    animation:pulseRing 1.6s ease-out infinite;
+  }
+  @keyframes pulseRing{
+    0%{ transform:scale(0.9); opacity:1; }
+    100%{ transform:scale(1.35); opacity:0; }
+  }
+
+  .load-copy{ text-align:center; }
+  .load-text{
+    font-family:'Sora', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:.4px;
+    color:var(--text-hi);
+  }
+  .load-sub{
+    font-size:12.5px;
+    color:var(--text-low);
+    margin-top:6px;
+  }
+
+  .progress-track{
+    width:150px;
+    height:3px;
+    border-radius:3px;
+    background:rgba(255,255,255,0.08);
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    width:30%;
+    border-radius:3px;
+    background:linear-gradient(90deg, var(--purple), var(--cyan));
+    animation:loadBar 1.1s ease-in-out infinite;
+  }
+  @keyframes loadBar{
+    0%{ transform:translateX(-100%); }
+    100%{ transform:translateX(400%); }
+  }
+
+  /* ---------- CONTENT ---------- */
+  #content{
+    opacity:0;
+    transform:translateY(14px);
+    transition:opacity .6s ease, transform .6s ease;
+  }
+  #content.show{ opacity:1; transform:translateY(0); }
+
+  .header{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:22px;
+  }
+  .avatar{
+    width:52px; height:52px;
+    border-radius:16px;
+    background:linear-gradient(135deg, var(--purple), var(--cyan));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 22px rgba(139,92,246,0.45);
+    flex-shrink:0;
+  }
+  .avatar svg{ width:24px; height:24px; color:#fff; }
+  .title-wrap h1{
+    font-family:'Sora', sans-serif;
+    font-weight:800;
+    font-size:22px;
+    letter-spacing:.6px;
+    background:linear-gradient(90deg, #c7b9ff, var(--cyan));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .title-wrap .sub{
+    font-size:11.5px;
+    color:var(--text-low);
+    margin-top:2px;
+    letter-spacing:.3px;
+  }
+  .divider{
+    height:1px;
+    background:linear-gradient(90deg, rgba(255,255,255,0.18), transparent);
+    margin-bottom:20px;
+  }
+
+  .row2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:16px;
+  }
+
+  .card{
+    border-radius:16px;
+    padding:16px 14px;
+    border:1px solid var(--card-border);
+    min-width:0;
+  }
+
+  .card-balance{ background:linear-gradient(160deg, var(--green-dim), #081a13 70%); border-color:rgba(34,224,138,0.35); }
+  .card-uid{ background:linear-gradient(160deg, var(--purple-dim), #140f24 70%); border-color:rgba(139,92,246,0.35); }
+
+  .mini-icon{
+    width:34px; height:34px;
+    border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:10px;
+  }
+  .mini-icon svg{ width:17px; height:17px; }
+  .mini-icon.green{ background:rgba(34,224,138,0.15); }
+  .mini-icon.green svg{ color:var(--green); }
+  .mini-icon.purple{ background:rgba(139,92,246,0.18); }
+  .mini-icon.purple svg{ color:#c7b3ff; }
+
+  .card-label{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.6px;
+    color:var(--text-mid);
+    text-transform:uppercase;
+    margin-bottom:4px;
+  }
+  .card-value{
+    font-family:'Sora', sans-serif;
+    font-size:20px;
+    font-weight:700;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .card-value.green{ color:var(--green); }
+  .card-value.purple{ color:#c7b3ff; }
+  .card-value small{ font-size:12.5px; font-weight:600; color:var(--text-mid); margin-left:3px; }
+
+  .section-card{
+    border-radius:18px;
+    padding:18px 16px;
+    border:1px solid var(--card-border);
+    margin-bottom:16px;
+  }
+  .section-service{ border-color:rgba(59,130,246,0.35); background:linear-gradient(160deg, rgba(59,130,246,0.06), transparent 60%); }
+  .section-overview{ border-color:rgba(245,165,36,0.4); background:linear-gradient(160deg, rgba(245,165,36,0.05), transparent 60%); }
+
+  .section-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .section-head .ic{ width:18px; height:18px; }
+  .section-head h2{
+    font-size:13.5px;
+    font-weight:800;
+    letter-spacing:.5px;
+  }
+  .section-service h2{ color:var(--cyan); }
+  .section-service .ic{ color:var(--cyan); }
+  .section-overview h2{ color:var(--orange); }
+  .section-overview .ic{ color:var(--orange); }
+  .section-line{
+    height:1px;
+    background:rgba(255,255,255,0.08);
+    margin-bottom:14px;
+  }
+
+  .service-grid{
+    display:grid;
+    grid-template-columns:1fr 1px 1fr;
+    align-items:center;
+  }
+  .service-item{ display:flex; align-items:center; gap:12px; min-width:0; }
+  .service-item .ic{
+    width:40px; height:40px;
+    border-radius:12px;
+    background:rgba(59,130,246,0.15);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .service-item .ic svg{ width:18px; height:18px; color:var(--cyan); }
+  .service-item .lab{ font-size:11px; color:var(--text-mid); font-weight:700; letter-spacing:.4px; }
+  .service-item .val{ font-family:'Sora', sans-serif; font-size:16px; font-weight:700; color:var(--cyan); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .service-sep{ background:rgba(255,255,255,0.1); height:70%; justify-self:center; }
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .stat-box{
+    border-radius:14px;
+    padding:16px 10px;
+    text-align:center;
+    border:1px solid;
+  }
+  .stat-box .ic{
+    width:34px; height:34px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 8px;
+  }
+  .stat-box .ic svg{ width:16px; height:16px; color:#fff; }
+  .stat-box .num{ font-family:'Sora', sans-serif; font-size:25px; font-weight:800; margin-bottom:4px; }
+  .stat-box .lab{ font-size:10.5px; font-weight:700; letter-spacing:.3px; color:var(--text-mid); line-height:1.3; text-transform:uppercase; }
+
+  .stat-total{ background:var(--blue-dim); border-color:rgba(59,130,246,0.35); }
+  .stat-total .ic{ background:var(--blue); }
+  .stat-total .num{ color:#dce8ff; }
+
+  .stat-pending{ background:var(--orange-dim); border-color:rgba(245,165,36,0.4); }
+  .stat-pending .ic{ background:var(--orange); }
+  .stat-pending .num{ color:#ffe1a8; }
+
+  .stat-approved{ background:var(--green-dim); border-color:rgba(34,224,138,0.4); }
+  .stat-approved .ic{ background:#1fbf72; }
+  .stat-approved .num{ color:var(--green); }
+
+  .stat-rejected{ background:var(--red-dim); border-color:rgba(255,84,112,0.4); }
+  .stat-rejected .ic{ background:var(--red); }
+  .stat-rejected .num{ color:#ffb0c0; }
+
+  .footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:14px 16px;
+    border-radius:14px;
+    background:rgba(59,130,246,0.06);
+    border:1px solid rgba(59,130,246,0.18);
+  }
+  .footer .thanks{ display:flex; align-items:center; gap:8px; color:#bcd4ff; font-weight:600; font-size:12.5px; }
+  .footer .thanks svg{ width:16px; height:16px; color:var(--cyan); flex-shrink:0; }
+  .footer .time{ text-align:right; font-size:10.5px; color:var(--text-low); letter-spacing:.3px; text-transform:uppercase; }
+  .footer .time b{ display:block; font-size:12.5px; color:var(--text-mid); font-weight:700; margin-top:3px; text-transform:none; letter-spacing:0; }
+
+  .error-box{
+    display:none;
+    text-align:center;
+    padding:60px 20px;
+    color:var(--text-mid);
+  }
+  .error-box.show{ display:flex; flex-direction:column; align-items:center; }
+  .error-box .ic{
+    width:56px; height:56px;
+    border-radius:16px;
+    background:var(--red-dim);
+    border:1px solid rgba(255,84,112,0.4);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:16px;
+  }
+  .error-box .ic svg{ width:26px; height:26px; color:var(--red); }
+  .error-box .t1{ font-family:'Sora', sans-serif; font-size:15px; font-weight:700; color:var(--text-hi); margin-bottom:6px; }
+  .error-box .t2{ font-size:12.5px; color:var(--text-low); max-width:280px; }
+
+  @media (max-width:340px){
+    .service-grid{ grid-template-columns:1fr; row-gap:16px; }
+    .service-sep{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+  <div id="loading">
+    <div class="load-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+    </div>
+    <div class="load-copy">
+      <div class="load-text">Loading your account</div>
+      <div class="load-sub">Fetching secure data from server</div>
+    </div>
+    <div class="progress-track"><div class="progress-fill"></div></div>
+  </div>
+
+  <div class="app">
+    <div id="content">
+
+      <div class="header">
+        <div class="avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+        </div>
+        <div class="title-wrap">
+          <h1>MY ACCOUNT</h1>
+          <div class="sub">Account overview &amp; earnings</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+
+      <div class="row2">
+        <div class="card card-balance">
+          <div class="mini-icon green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/><circle cx="16" cy="14.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+          </div>
+          <div class="card-label">Available Balance</div>
+          <div class="card-value green" id="balanceVal">0.00<small>USDT</small></div>
+        </div>
+        <div class="card card-uid">
+          <div class="mini-icon purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8.5" cy="12" r="2"/><path d="M6 16.5c.5-1.5 1.8-2.5 2.5-2.5s2 1 2.5 2.5"/><path d="M14 10h5M14 14h3"/></svg>
+          </div>
+          <div class="card-label">User ID</div>
+          <div class="card-value purple" id="uidVal">--</div>
+        </div>
+      </div>
+
+      <div class="section-card section-service">
+        <div class="section-head">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.6 1z"/></svg>
+          <h2>SERVICE INFORMATION</h2>
+        </div>
+        <div class="section-line"></div>
+        <div class="service-grid">
+          <div class="service-item">
+            <div class="ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 12.6 12.6 20.6a2 2 0 0 1-2.8 0l-7.4-7.4V4h9.2l7.4 7.4a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+            </div>
+            <div>
+              <div class="lab">RATE</div>
+              <div class="val" id="rateVal">--</div>
+            </div>
+          </div>
+          <div class="service-sep"></div>
+          <div class="service-item">
+            <div class="ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+            </div>
+            <div>
+              <div class="lab">REVIEW TIME</div>
+              <div class="val" id="reviewVal">--</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card section-overview">
+        <div class="section-head">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12.5" y="8" width="3" height="10"/><rect x="18" y="5" width="3" height="13"/></svg>
+          <h2>SUBMISSION OVERVIEW</h2>
+        </div>
+        <div class="section-line"></div>
+        <div class="stat-grid">
+          <div class="stat-box stat-total">
+            <div class="ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+            </div>
+            <div class="num" id="totalVal">0</div>
+            <div class="lab">Total<br>Submitted</div>
+          </div>
+          <div class="stat-box stat-pending">
+            <div class="ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 6.5V12l4 2.2"/></svg>
+            </div>
+            <div class="num" id="pendingVal">0</div>
+            <div class="lab">Pending<br>Review</div>
+          </div>
+          <div class="stat-box stat-approved">
+            <div class="ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <div class="num" id="approvedVal">0</div>
+            <div class="lab">Approved<br>(Paid)</div>
+          </div>
+          <div class="stat-box stat-rejected">
+            <div class="ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </div>
+            <div class="num" id="rejectedVal">0</div>
+            <div class="lab">Rejected</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="thanks">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.4 8.7 8 9 4.6-.3 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+          <span>Thank you for using our service.</span>
+        </div>
+        <div class="time">Last update<b id="updatedVal">--</b></div>
+      </div>
+
+    </div>
+
+    <div class="error-box" id="errorBox">
+      <div class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+      </div>
+      <div class="t1">Unable to load account</div>
+      <div class="t2">We couldn't fetch your data. Please try again or contact support.</div>
+    </div>
+  </div>
+
+<script>
+  const FIREBASE_BASE = "https://ranger-shop-default-rtdb.firebaseio.com";
+  const DB_PATH = "UsersAccountData";
+
+  function getTelegramUserId(){
+    try{
+      const tg = window.Telegram && window.Telegram.WebApp;
+      if(tg){
+        tg.ready();
+        tg.expand();
+        const u = tg.initDataUnsafe && tg.initDataUnsafe.user;
+        if(u && u.id) return String(u.id);
+      }
+    }catch(e){}
+    const params = new URLSearchParams(window.location.search);
+    if(params.get("uid")) return params.get("uid");
+    return null;
+  }
+
+  function formatBDTime(ts){
+    if(!ts) return "--";
+    let ms = Number(ts);
+    if(ms < 10_000_000_000) ms *= 1000; // seconds -> ms fallback
+    const d = new Date(ms);
+    if(isNaN(d.getTime())) return "--";
+    return new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Dhaka",
+      day: "2-digit", month: "short", year: "numeric",
+      hour: "2-digit", minute: "2-digit", hour12: true
+    }).format(d) + " BST";
+  }
+
+  function animateNumber(el, target){
+    target = Number(target) || 0;
+    let cur = 0;
+    const step = Math.max(1, Math.round(target / 20));
+    const t = setInterval(()=>{
+      cur += step;
+      if(cur >= target){ cur = target; clearInterval(t); }
+      el.textContent = cur;
+    }, 25);
+  }
+
+  function renderData(uid, data){
+    document.getElementById("uidVal").textContent = data.user_id || uid;
+    document.getElementById("balanceVal").innerHTML =
+      Number(data.balance ?? 0).toFixed(2) + "<small>USDT</small>";
+
+    let rate = data.rate ?? "--";
+    if(typeof rate === "number") rate = rate.toFixed(2) + " USDT";
+    document.getElementById("rateVal").textContent = rate;
+
+    document.getElementById("reviewVal").textContent = data.review_time ?? "--";
+
+    animateNumber(document.getElementById("totalVal"), data.total_submitted ?? 0);
+    animateNumber(document.getElementById("pendingVal"), data.pending ?? 0);
+    animateNumber(document.getElementById("approvedVal"), data.approved ?? 0);
+    animateNumber(document.getElementById("rejectedVal"), data.rejected ?? 0);
+
+    document.getElementById("updatedVal").textContent = formatBDTime(data.updated_at);
+
+    document.getElementById("loading").classList.add("hide");
+    document.getElementById("content").classList.add("show");
+  }
+
+  function showError(){
+    document.getElementById("loading").classList.add("hide");
+    document.getElementById("content").style.display = "none";
+    document.getElementById("errorBox").classList.add("show");
+  }
+
+  async function loadAccount(){
+    const uid = getTelegramUserId();
+    if(!uid){
+      showError();
+      return;
+    }
+    try{
+      const res = await fetch(`${FIREBASE_BASE}/${DB_PATH}/${uid}.json`);
+      if(!res.ok) throw new Error("network");
+      const data = await res.json();
+      if(!data){ showError(); return; }
+      // small delay so the premium loading state is never a flash
+      setTimeout(()=>renderData(uid, data), 350);
+    }catch(err){
+      showError();
+    }
+  }
+
+  window.addEventListener("DOMContentLoaded", loadAccount);
+</script>
+</body>
+</html>
