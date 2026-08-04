@@ -9,36 +9,39 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --iris:#8f7dff;
-    --aqua:#48e6ff;
-    --mint:#3df0b6;
-    --amber:#ffbd5c;
-    --coral:#ff7a93;
-    --sapphire:#5c93ff;
+    /* deeper, richer jewel-tone palette */
+    --iris:#7c5cff;
+    --iris-deep:#5a35e0;
+    --aqua:#1fd8f0;
+    --mint:#0fe6a8;
+    --amber:#ffa722;
+    --coral:#ff4470;
+    --sapphire:#3f74ff;
 
-    --glass-fill:rgba(255,255,255,0.06);
-    --glass-fill-hi:rgba(255,255,255,0.11);
-    --glass-border:rgba(255,255,255,0.20);
-    --glass-border-soft:rgba(255,255,255,0.12);
+    --glass-fill:rgba(255,255,255,0.05);
+    --glass-fill-hi:rgba(255,255,255,0.10);
+    --glass-border:rgba(255,255,255,0.18);
+    --glass-border-soft:rgba(255,255,255,0.11);
 
-    --text-hi:#f3f5ff;
-    --text-mid:#aab2cf;
-    --text-low:#6d759a;
+    --text-hi:#f5f6ff;
+    --text-mid:#9aa3c4;
+    --text-low:#5c6488;
 
-    --bg-0:#0a0d1c;
+    --bg-0:#040512;
 
-    /* tuned down automatically on low-power devices via JS */
     --blur-strong:22px;
     --blur-soft:12px;
     --blur-orb:70px;
   }
 
   *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
-
   html,body{ height:100%; }
 
   body{
-    background:var(--bg-0);
+    background:
+      radial-gradient(120% 70% at 15% -10%, rgba(90,53,224,0.28), transparent 55%),
+      radial-gradient(100% 60% at 105% 0%, rgba(31,216,240,0.16), transparent 55%),
+      var(--bg-0);
     color:var(--text-hi);
     font-family:'Manrope', system-ui, sans-serif;
     overflow-x:hidden;
@@ -53,18 +56,25 @@
 
   /* ---------- AMBIENT GLASS BACKDROP ---------- */
   .aurora{ position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; contain:strict; }
-  .aurora span{ position:absolute; border-radius:50%; filter:blur(var(--blur-orb)); opacity:0.5; mix-blend-mode:screen; will-change:transform; }
-  .a1{ width:300px; height:300px; background:var(--iris); top:-110px; left:-80px; animation:float1 18s ease-in-out infinite; }
-  .a2{ width:260px; height:260px; background:var(--aqua); top:20%; right:-110px; animation:float2 21s ease-in-out infinite; }
-  .a3{ width:230px; height:230px; background:var(--mint); bottom:-90px; left:8%; animation:float3 23s ease-in-out infinite; }
-  .a4{ width:200px; height:200px; background:var(--coral); bottom:8%; right:4%; animation:float1 26s ease-in-out infinite reverse; opacity:0.3; }
+  .aurora span{ position:absolute; border-radius:50%; filter:blur(var(--blur-orb)); opacity:0.55; mix-blend-mode:screen; }
+  .a1{ width:300px; height:300px; background:var(--iris); top:-110px; left:-80px; }
+  .a2{ width:260px; height:260px; background:var(--aqua); top:20%; right:-110px; }
+  .a3{ width:230px; height:230px; background:var(--mint); bottom:-90px; left:8%; }
+  .a4{ width:200px; height:200px; background:var(--coral); bottom:8%; right:4%; opacity:0.32; }
+
+  /* animation only runs on devices we've decided can afford it (see JS) */
+  html.fx-full .a1{ animation:float1 18s ease-in-out infinite; }
+  html.fx-full .a2{ animation:float2 21s ease-in-out infinite; }
+  html.fx-full .a3{ animation:float3 23s ease-in-out infinite; }
+  html.fx-full .a4{ animation:float1 26s ease-in-out infinite reverse; }
+  html.fx-paused .aurora span{ animation-play-state:paused !important; }
 
   @keyframes float1{ 0%,100%{ transform:translate3d(0,0,0) scale(1);} 50%{ transform:translate3d(26px,34px,0) scale(1.08);} }
   @keyframes float2{ 0%,100%{ transform:translate3d(0,0,0) scale(1);} 50%{ transform:translate3d(-34px,20px,0) scale(0.96);} }
   @keyframes float3{ 0%,100%{ transform:translate3d(0,0,0) scale(1);} 50%{ transform:translate3d(20px,-28px,0) scale(1.06);} }
 
   .grain{
-    position:fixed; inset:0; z-index:1; pointer-events:none; opacity:0.03;
+    position:fixed; inset:0; z-index:1; pointer-events:none; opacity:0.028;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
@@ -77,11 +87,11 @@
     background:linear-gradient(160deg, var(--glass-fill-hi), var(--glass-fill) 60%);
     border:1px solid var(--glass-border);
     border-radius:20px;
-    backdrop-filter:blur(var(--blur-strong)) saturate(150%);
-    -webkit-backdrop-filter:blur(var(--blur-strong)) saturate(150%);
+    backdrop-filter:blur(var(--blur-strong)) saturate(170%);
+    -webkit-backdrop-filter:blur(var(--blur-strong)) saturate(170%);
     box-shadow:
-      0 8px 28px rgba(0,0,0,0.32),
-      inset 0 1px 0 rgba(255,255,255,0.22),
+      0 10px 30px rgba(0,0,0,0.45),
+      inset 0 1px 0 rgba(255,255,255,0.20),
       inset 0 0 0 1px rgba(255,255,255,0.02);
     overflow:hidden;
     transform:translateZ(0);
@@ -89,7 +99,7 @@
   .glass::before{
     content:"";
     position:absolute; top:-60%; left:-30%; width:70%; height:220%;
-    background:linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.14) 48%, transparent 56%);
+    background:linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.13) 48%, transparent 56%);
     transform:rotate(8deg);
     pointer-events:none;
   }
@@ -108,8 +118,8 @@
   .load-bar{
     fill:none; stroke:url(#loadGrad); stroke-width:4; stroke-linecap:round;
     stroke-dasharray:314; stroke-dashoffset:314;
-    filter:drop-shadow(0 0 6px rgba(143,125,255,0.55));
   }
+  html.fx-full .load-bar{ filter:drop-shadow(0 0 6px rgba(124,92,255,0.6)); }
   .load-core{ width:78px; height:78px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-direction:column; }
   .load-pct{ font-family:'Sora', sans-serif; font-weight:800; font-size:20px; color:var(--text-hi); letter-spacing:.3px; }
 
@@ -127,46 +137,56 @@
   .header{ display:flex; align-items:center; gap:14px; margin-bottom:18px; padding:14px 16px; border-radius:20px; }
   .avatar{
     width:50px; height:50px; border-radius:15px;
-    background:linear-gradient(150deg, rgba(143,125,255,0.5), rgba(72,230,255,0.35));
+    background:linear-gradient(150deg, var(--iris-deep), var(--aqua) 130%);
     border:1px solid var(--glass-border); backdrop-filter:blur(var(--blur-soft));
     display:flex; align-items:center; justify-content:center;
-    box-shadow:0 0 24px rgba(143,125,255,0.32), inset 0 1px 0 rgba(255,255,255,0.4);
+    box-shadow:0 0 26px rgba(124,92,255,0.45), inset 0 1px 0 rgba(255,255,255,0.4);
     flex-shrink:0;
   }
   .avatar svg{ width:23px; height:23px; color:#fff; }
   .title-wrap h1{
     font-family:'Sora', sans-serif; font-weight:800; font-size:20px; letter-spacing:.8px;
-    background:linear-gradient(90deg, #e4e0ff, var(--aqua));
+    background:linear-gradient(90deg, #d8c9ff, var(--aqua));
     -webkit-background-clip:text; background-clip:text; color:transparent;
   }
   .title-wrap .sub{ font-size:11px; color:var(--text-low); margin-top:2px; letter-spacing:.3px; }
 
   .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
   .card{ padding:16px 14px; }
-  .card-balance{ border-color:rgba(61,240,182,0.30); }
-  .card-balance::after{ content:""; position:absolute; inset:0; border-radius:20px; pointer-events:none; box-shadow:inset 0 0 36px rgba(61,240,182,0.06); }
-  .card-uid{ border-color:rgba(143,125,255,0.30); }
-  .card-uid::after{ content:""; position:absolute; inset:0; border-radius:20px; pointer-events:none; box-shadow:inset 0 0 36px rgba(143,125,255,0.07); }
+  .card-balance{
+    background:linear-gradient(160deg, rgba(15,230,168,0.20), rgba(255,255,255,0.04) 65%);
+    border-color:rgba(15,230,168,0.38);
+  }
+  .card-uid{
+    background:linear-gradient(160deg, rgba(124,92,255,0.22), rgba(255,255,255,0.04) 65%);
+    border-color:rgba(124,92,255,0.38);
+  }
 
   .mini-icon{
     width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center;
     margin-bottom:10px; border:1px solid var(--glass-border-soft); position:relative; z-index:1;
   }
   .mini-icon svg{ width:16px; height:16px; }
-  .mini-icon.mint{ background:rgba(61,240,182,0.14); }
+  .mini-icon.mint{ background:rgba(15,230,168,0.20); }
   .mini-icon.mint svg{ color:var(--mint); }
-  .mini-icon.iris{ background:rgba(143,125,255,0.16); }
-  .mini-icon.iris svg{ color:#c8bfff; }
+  .mini-icon.iris{ background:rgba(124,92,255,0.22); }
+  .mini-icon.iris svg{ color:#cdbfff; }
 
   .card-label{ font-size:10.5px; font-weight:700; letter-spacing:.7px; color:var(--text-mid); text-transform:uppercase; margin-bottom:4px; position:relative; z-index:1; }
   .card-value{ font-family:'Sora', sans-serif; font-size:19px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; position:relative; z-index:1; }
   .card-value.mint{ color:var(--mint); }
-  .card-value.iris{ color:#c8bfff; }
+  .card-value.iris{ color:#cdbfff; }
   .card-value small{ font-size:11.5px; font-weight:600; color:var(--text-mid); margin-left:3px; }
 
   .section-card{ padding:18px 16px; margin-bottom:14px; }
-  .section-service{ border-color:rgba(92,147,255,0.30); }
-  .section-overview{ border-color:rgba(255,189,92,0.30); }
+  .section-service{
+    background:linear-gradient(160deg, rgba(63,116,255,0.14), rgba(255,255,255,0.03) 65%);
+    border-color:rgba(63,116,255,0.35);
+  }
+  .section-overview{
+    background:linear-gradient(160deg, rgba(255,167,34,0.13), rgba(255,255,255,0.03) 65%);
+    border-color:rgba(255,167,34,0.35);
+  }
 
   .section-head{ display:flex; align-items:center; gap:10px; margin-bottom:14px; position:relative; z-index:1; }
   .section-head .ic{ width:17px; height:17px; }
@@ -180,35 +200,43 @@
   .service-grid{ display:grid; grid-template-columns:1fr 1px 1fr; align-items:center; position:relative; z-index:1; }
   .service-item{ display:flex; align-items:center; gap:12px; min-width:0; }
   .service-item .ic{
-    width:38px; height:38px; border-radius:11px; background:rgba(92,147,255,0.14);
+    width:38px; height:38px; border-radius:11px; background:rgba(63,116,255,0.18);
     border:1px solid var(--glass-border-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0;
   }
   .service-item .ic svg{ width:17px; height:17px; color:var(--sapphire); }
   .service-item .lab{ font-size:10.5px; color:var(--text-mid); font-weight:700; letter-spacing:.4px; }
-  .service-item .val{ font-family:'Sora', sans-serif; font-size:15px; font-weight:700; color:#a9c4ff; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .service-item .val{ font-family:'Sora', sans-serif; font-size:15px; font-weight:700; color:#aecaff; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .service-sep{ background:rgba(255,255,255,0.10); height:70%; justify-self:center; }
 
   .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; position:relative; z-index:1; }
   .stat-box{
     border-radius:15px; padding:16px 10px; text-align:center; border:1px solid var(--glass-border-soft);
-    background:rgba(255,255,255,0.04); backdrop-filter:blur(var(--blur-soft));
+    background:rgba(255,255,255,0.035); backdrop-filter:blur(var(--blur-soft));
   }
   .stat-box .ic{ width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; border:1px solid rgba(255,255,255,0.18); }
   .stat-box .ic svg{ width:15px; height:15px; color:#fff; }
   .stat-box .num{ font-family:'Sora', sans-serif; font-size:24px; font-weight:800; margin-bottom:4px; }
   .stat-box .lab{ font-size:10px; font-weight:700; letter-spacing:.3px; color:var(--text-mid); line-height:1.3; text-transform:uppercase; }
 
-  .stat-total .ic{ background:rgba(92,147,255,0.35); }
+  .stat-total{ border-color:rgba(63,116,255,0.30); }
+  .stat-total .ic{ background:rgba(63,116,255,0.45); }
   .stat-total .num{ color:#c3d6ff; }
-  .stat-pending .ic{ background:rgba(255,189,92,0.35); }
+  .stat-pending{ border-color:rgba(255,167,34,0.32); }
+  .stat-pending .ic{ background:rgba(255,167,34,0.45); }
   .stat-pending .num{ color:#ffdca8; }
-  .stat-approved .ic{ background:rgba(61,240,182,0.35); }
+  .stat-approved{ border-color:rgba(15,230,168,0.32); }
+  .stat-approved .ic{ background:rgba(15,230,168,0.45); }
   .stat-approved .num{ color:var(--mint); }
-  .stat-rejected .ic{ background:rgba(255,122,147,0.35); }
-  .stat-rejected .num{ color:#ffc0cd; }
+  .stat-rejected{ border-color:rgba(255,68,112,0.32); }
+  .stat-rejected .ic{ background:rgba(255,68,112,0.45); }
+  .stat-rejected .num{ color:#ffb3c4; }
 
-  .footer{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 16px; border-radius:16px; border-color:rgba(92,147,255,0.20); }
-  .footer .thanks{ display:flex; align-items:center; gap:8px; color:#c6d6ff; font-weight:600; font-size:12px; position:relative; z-index:1; }
+  .footer{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 16px; border-radius:16px;
+    background:linear-gradient(160deg, rgba(63,116,255,0.10), rgba(255,255,255,0.03) 65%);
+    border-color:rgba(63,116,255,0.24);
+  }
+  .footer .thanks{ display:flex; align-items:center; gap:8px; color:#c8d8ff; font-weight:600; font-size:12px; position:relative; z-index:1; }
   .footer .thanks svg{ width:15px; height:15px; color:var(--aqua); flex-shrink:0; }
   .footer .time{ text-align:right; font-size:10px; color:var(--text-low); letter-spacing:.3px; text-transform:uppercase; position:relative; z-index:1; }
   .footer .time b{ display:block; font-size:12px; color:var(--text-mid); font-weight:700; margin-top:3px; text-transform:none; letter-spacing:0; }
@@ -216,8 +244,8 @@
   .error-box{ display:none; text-align:center; padding:60px 20px; color:var(--text-mid); flex-direction:column; align-items:center; }
   .error-box.show{ display:flex; }
   .error-box .ic{
-    width:54px; height:54px; border-radius:16px; background:rgba(255,122,147,0.12);
-    border:1px solid rgba(255,122,147,0.35); display:flex; align-items:center; justify-content:center;
+    width:54px; height:54px; border-radius:16px; background:rgba(255,68,112,0.14);
+    border:1px solid rgba(255,68,112,0.38); display:flex; align-items:center; justify-content:center;
     margin-bottom:16px; backdrop-filter:blur(var(--blur-soft));
   }
   .error-box .ic svg{ width:24px; height:24px; color:var(--coral); }
@@ -242,15 +270,13 @@
   .flash{
     position:absolute; border-radius:50%;
     background:radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.25) 40%, transparent 72%);
-    will-change:transform, opacity;
   }
   .shard{
     position:absolute;
     background:linear-gradient(140deg, rgba(255,255,255,0.6), rgba(255,255,255,0.05));
     border:1px solid rgba(255,255,255,0.5);
-    box-shadow:0 2px 10px rgba(0,0,0,0.28);
-    will-change:transform, opacity;
   }
+  html.fx-full .shard{ box-shadow:0 2px 10px rgba(0,0,0,0.28); }
   .crack{ position:absolute; overflow:visible; }
 
   @media (prefers-reduced-motion: reduce){
@@ -271,8 +297,8 @@
       <svg viewBox="0 0 112 112">
         <defs>
           <linearGradient id="loadGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#8f7dff"/>
-            <stop offset="100%" stop-color="#48e6ff"/>
+            <stop offset="0%" stop-color="#7c5cff"/>
+            <stop offset="100%" stop-color="#1fd8f0"/>
           </linearGradient>
         </defs>
         <circle class="load-track" cx="56" cy="56" r="50"/>
@@ -413,22 +439,11 @@
   const DB_PATH = "UsersAccountData";
 
   /* ---------------------------------------------------------
-     Robust user-id detection.
-
-     The bot opens this page with a Web App button like:
-       web_app: { url: "https://my-account-mu.vercel.app?id=" + userId }
-
-     So the user id is passed as a normal "?id=" query param on
-     the URL — Telegram does NOT rewrite that into initData. We
-     read it directly, and ALSO try Telegram's own initDataUnsafe
-     as a bonus source in case both are present. Order:
-       1) ?id=  (what the bot actually sends)
-       2) ?uid= (kept for backward compatibility)
-       3) Telegram initDataUnsafe.user.id
-       4) raw initData string, manually parsed
-       5) tgWebAppData from the URL hash
+     User-id detection — the bot opens this page as:
+       web_app: { url: ".../?id=" + userId }
+     so ?id= is the primary source; Telegram's own
+     initDataUnsafe is used as a bonus/fallback.
   --------------------------------------------------------- */
-
   function parseUserIdFromInitDataString(raw){
     if(!raw) return null;
     try{
@@ -443,24 +458,20 @@
   }
 
   function getTelegramUserId(){
-    // 1 & 2: query params (this is how the bot's menu button actually passes the id)
     const params = new URLSearchParams(window.location.search);
     if(params.get("id")) return params.get("id");
     if(params.get("uid")) return params.get("uid");
 
-    // 3 & 4: Telegram SDK
     try{
       const tg = window.Telegram && window.Telegram.WebApp;
       if(tg){
         const u = tg.initDataUnsafe && tg.initDataUnsafe.user;
         if(u && u.id) return String(u.id);
-
         const fromInitData = parseUserIdFromInitDataString(tg.initData);
         if(fromInitData) return fromInitData;
       }
     }catch(e){}
 
-    // 5: fallback, parse tgWebAppData straight out of the URL hash
     try{
       const hash = window.location.hash ? window.location.hash.slice(1) : "";
       const hashParams = new URLSearchParams(hash);
@@ -482,10 +493,7 @@
           resolve(tg);
           return;
         }
-        if(Date.now() - started >= maxWaitMs){
-          resolve(null);
-          return;
-        }
+        if(Date.now() - started >= maxWaitMs){ resolve(null); return; }
         setTimeout(poll, 80);
       })();
     });
@@ -494,7 +502,7 @@
   function formatBDTime(ts){
     if(!ts) return "--";
     let ms = Number(ts);
-    if(ms < 10_000_000_000) ms *= 1000; // seconds -> ms fallback
+    if(ms < 10_000_000_000) ms *= 1000;
     const d = new Date(ms);
     if(isNaN(d.getTime())) return "--";
     return new Intl.DateTimeFormat("en-GB", {
@@ -615,9 +623,6 @@
 
   async function loadAccount(){
     setLoadProgress(8);
-
-    // give Telegram's SDK a moment (only matters if we don't already
-    // have an id from the query string)
     const paramsNow = new URLSearchParams(window.location.search);
     if(!paramsNow.get("id") && !paramsNow.get("uid")){
       await waitForTelegramWebApp(2000);
@@ -635,10 +640,7 @@
       const res = await fetch(`${FIREBASE_BASE}/${DB_PATH}/${uid}.json`);
       if(!res.ok) throw new Error("HTTP " + res.status);
       const data = await res.json();
-      if(!data){
-        showError("No account record found for user ID " + uid + ".");
-        return;
-      }
+      if(!data){ showError("No account record found for user ID " + uid + "."); return; }
       renderData(uid, data);
     }catch(err){
       showError("Network error: " + (err && err.message ? err.message : "request failed"));
@@ -659,34 +661,117 @@
   });
 
   /* ---------------------------------------------------------
-     Performance tuning for phones:
-     - detect low-power / small-screen devices and cut down
-       blur radius, orb size and shard count so nothing janks
-     - respect prefers-reduced-motion
-     - throttle rapid taps so shatter bursts never stack up
+     PERFORMANCE / HEAT MANAGEMENT
+     Heavy, continuous backdrop-filter blur + infinite CSS
+     animations are what make a phone warm up on a "glass" page.
+     We classify the device once, then:
+       - fx-full   : blur stays strong, aurora blobs float
+       - (default) : blur is cut down hard, aurora blobs are
+                      completely static (no infinite animation)
+     Either way, all effects pause the instant the tab/app is
+     backgrounded, and shatter bursts are capped + cooled down
+     so rapid tapping can never pile up work.
   --------------------------------------------------------- */
   const isSmallScreen = window.matchMedia("(max-width: 480px)").matches;
   const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
   const lowMemory = (navigator.deviceMemory && navigator.deviceMemory <= 4);
-  const isMobile = isSmallScreen || isCoarsePointer || lowMemory;
+  const fewCores = (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+  const isMobile = isSmallScreen || isCoarsePointer || lowMemory || fewCores;
 
+  const html = document.documentElement;
   if(isMobile){
-    document.documentElement.style.setProperty("--blur-strong", "12px");
-    document.documentElement.style.setProperty("--blur-soft", "8px");
-    document.documentElement.style.setProperty("--blur-orb", "40px");
+    html.classList.add("fx-reduced");
+    document.documentElement.style.setProperty("--blur-strong", "9px");
+    document.documentElement.style.setProperty("--blur-soft", "6px");
+    document.documentElement.style.setProperty("--blur-orb", "26px");
+  }else{
+    html.classList.add("fx-full");
   }
 
+  // pause everything animated while the app is backgrounded (saves battery/heat)
+  document.addEventListener("visibilitychange", ()=>{
+    if(document.hidden){ html.classList.add("fx-paused"); }
+    else{ html.classList.remove("fx-paused"); }
+  });
+
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------------------------------------------------------
+     GLASS-BREAK SOUND
+     Synthesized on the fly with the Web Audio API (no audio
+     file to download/decode) — a short filtered noise burst
+     plus a couple of high, quickly-decaying "tink" tones.
+  --------------------------------------------------------- */
+  let audioCtx = null;
+  function getAudioCtx(){
+    if(!audioCtx){
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if(!Ctx) return null;
+      audioCtx = new Ctx();
+    }
+    if(audioCtx.state === "suspended"){ audioCtx.resume(); }
+    return audioCtx;
+  }
+
+  function playGlassBreak(){
+    const ctx = getAudioCtx();
+    if(!ctx) return;
+    const now = ctx.currentTime;
+    const master = ctx.createGain();
+    master.gain.value = 0.22;
+    master.connect(ctx.destination);
+
+    // noisy "crack" burst
+    const bufSize = Math.floor(ctx.sampleRate * 0.18);
+    const buffer = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let i = 0; i < bufSize; i++){
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufSize, 2);
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const bandpass = ctx.createBiquadFilter();
+    bandpass.type = "bandpass";
+    bandpass.frequency.value = 3200;
+    bandpass.Q.value = 0.7;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.9, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+    noise.connect(bandpass);
+    bandpass.connect(noiseGain);
+    noiseGain.connect(master);
+    noise.start(now);
+    noise.stop(now + 0.2);
+
+    // a few bright, quickly-decaying glass "tink" tones
+    const tinkCount = 3 + Math.floor(Math.random() * 2);
+    for(let i = 0; i < tinkCount; i++){
+      const osc = ctx.createOscillator();
+      osc.type = "sine";
+      const freq = 2600 + Math.random() * 2600;
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.6, now + 0.14);
+      const gain = ctx.createGain();
+      const start = now + i * 0.012;
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.5, start + 0.006);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.16 + Math.random() * 0.08);
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start(start);
+      osc.stop(start + 0.3);
+    }
+  }
 
   /* ---------- click anywhere: realistic glass shatter ---------- */
   const shatterLayer = document.getElementById("shatterLayer");
   const appRoot = document.getElementById("appRoot");
   const SHARD_TINTS = [
     "rgba(255,255,255,0.6)",
-    "rgba(143,125,255,0.4)",
-    "rgba(72,230,255,0.35)",
-    "rgba(61,240,182,0.32)",
-    "rgba(255,189,92,0.3)"
+    "rgba(124,92,255,0.42)",
+    "rgba(31,216,240,0.36)",
+    "rgba(15,230,168,0.34)",
+    "rgba(255,167,34,0.30)"
   ];
 
   function rnd(min, max){ return min + Math.random() * (max - min); }
@@ -756,12 +841,14 @@
   }
 
   let lastShatter = 0;
-  const SHATTER_COOLDOWN = 90;
+  const SHATTER_COOLDOWN = isMobile ? 160 : 90;
 
   function shatterAt(x, y){
     const now = performance.now();
     if(now - lastShatter < SHATTER_COOLDOWN) return;
     lastShatter = now;
+
+    playGlassBreak();
 
     if(prefersReducedMotion) return;
 
@@ -773,7 +860,7 @@
 
     const ringCount = isMobile ? 2 : 3;
     for(let r = 0; r < ringCount; r++){
-      const shardsInRing = (isMobile ? 5 : 8) + r * (isMobile ? 2 : 4);
+      const shardsInRing = (isMobile ? 4 : 8) + r * (isMobile ? 2 : 4);
       const ringRadius = 18 + r * 34;
       for(let i = 0; i < shardsInRing; i++){
         createShard(x, y, ringRadius, r);
