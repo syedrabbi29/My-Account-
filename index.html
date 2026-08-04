@@ -20,7 +20,6 @@
     --glass-fill-hi:rgba(255,255,255,0.11);
     --glass-border:rgba(255,255,255,0.20);
     --glass-border-soft:rgba(255,255,255,0.12);
-    --glass-sheen:rgba(255,255,255,0.55);
 
     --text-hi:#f3f5ff;
     --text-mid:#aab2cf;
@@ -48,20 +47,8 @@
   }
 
   /* ---------- AMBIENT GLASS BACKDROP ---------- */
-  .aurora{
-    position:fixed;
-    inset:0;
-    z-index:0;
-    overflow:hidden;
-    pointer-events:none;
-  }
-  .aurora span{
-    position:absolute;
-    border-radius:50%;
-    filter:blur(70px);
-    opacity:0.55;
-    mix-blend-mode:screen;
-  }
+  .aurora{ position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+  .aurora span{ position:absolute; border-radius:50%; filter:blur(70px); opacity:0.55; mix-blend-mode:screen; }
   .a1{ width:340px; height:340px; background:var(--iris); top:-120px; left:-90px; animation:float1 16s ease-in-out infinite; }
   .a2{ width:300px; height:300px; background:var(--aqua); top:20%; right:-120px; animation:float2 19s ease-in-out infinite; }
   .a3{ width:260px; height:260px; background:var(--mint); bottom:-100px; left:10%; animation:float3 21s ease-in-out infinite; }
@@ -72,12 +59,11 @@
   @keyframes float3{ 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(25px,-35px) scale(1.08);} }
 
   .grain{
-    position:fixed; inset:0; z-index:1; pointer-events:none;
-    opacity:0.035;
+    position:fixed; inset:0; z-index:1; pointer-events:none; opacity:0.035;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  .app{ width:100%; max-width:460px; position:relative; z-index:2; }
+  .app{ width:100%; max-width:460px; position:relative; z-index:2; transition:filter .25s ease; }
   svg{ display:block; }
 
   /* ---------- SHARED GLASS SURFACE ---------- */
@@ -96,9 +82,7 @@
   }
   .glass::before{
     content:"";
-    position:absolute;
-    top:-60%; left:-30%;
-    width:70%; height:220%;
+    position:absolute; top:-60%; left:-30%; width:70%; height:220%;
     background:linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.16) 48%, transparent 56%);
     transform:rotate(8deg);
     pointer-events:none;
@@ -106,25 +90,13 @@
 
   /* ---------- LOADING ---------- */
   #loading{
-    position:fixed;
-    inset:0;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:22px;
-    background:var(--bg-0);
-    z-index:60;
+    position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:22px; background:var(--bg-0); z-index:60;
     transition:opacity .6s ease, visibility .6s ease;
   }
   #loading.hide{ opacity:0; visibility:hidden; pointer-events:none; }
 
-  .load-ring-wrap{
-    width:112px; height:112px;
-    border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    position:relative;
-  }
+  .load-ring-wrap{ width:112px; height:112px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative; }
   .load-ring-wrap svg{ width:112px; height:112px; position:absolute; inset:0; transform:rotate(-90deg); }
   .load-track{ fill:none; stroke:rgba(255,255,255,0.10); stroke-width:4; }
   .load-bar{
@@ -132,40 +104,25 @@
     stroke-dasharray:314; stroke-dashoffset:314;
     filter:drop-shadow(0 0 6px rgba(143,125,255,0.6));
   }
-  .load-core{
-    width:78px; height:78px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    flex-direction:column;
-  }
-  .load-pct{
-    font-family:'Sora', sans-serif; font-weight:800; font-size:20px; color:var(--text-hi);
-    letter-spacing:.3px;
-  }
+  .load-core{ width:78px; height:78px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-direction:column; }
+  .load-pct{ font-family:'Sora', sans-serif; font-weight:800; font-size:20px; color:var(--text-hi); letter-spacing:.3px; }
 
   .load-copy{ text-align:center; }
-  .load-text{
-    font-family:'Sora', sans-serif; font-weight:700; font-size:14.5px; letter-spacing:.5px; color:var(--text-hi);
-  }
+  .load-text{ font-family:'Sora', sans-serif; font-weight:700; font-size:14.5px; letter-spacing:.5px; color:var(--text-hi); }
   .load-sub{ font-size:11.5px; color:var(--text-low); margin-top:6px; letter-spacing:.2px; }
 
   /* ---------- CONTENT ---------- */
   #content{
-    opacity:0;
-    transform:translateY(16px) scale(0.98);
+    opacity:0; transform:translateY(16px) scale(0.98);
     transition:opacity .7s cubic-bezier(.2,.8,.2,1), transform .7s cubic-bezier(.2,.8,.2,1);
   }
   #content.show{ opacity:1; transform:translateY(0) scale(1); }
 
-  .header{
-    display:flex; align-items:center; gap:14px; margin-bottom:18px;
-    padding:14px 16px;
-    border-radius:20px;
-  }
+  .header{ display:flex; align-items:center; gap:14px; margin-bottom:18px; padding:14px 16px; border-radius:20px; }
   .avatar{
     width:50px; height:50px; border-radius:15px;
     background:linear-gradient(150deg, rgba(143,125,255,0.5), rgba(72,230,255,0.35));
-    border:1px solid var(--glass-border);
-    backdrop-filter:blur(10px);
+    border:1px solid var(--glass-border); backdrop-filter:blur(10px);
     display:flex; align-items:center; justify-content:center;
     box-shadow:0 0 26px rgba(143,125,255,0.35), inset 0 1px 0 rgba(255,255,255,0.4);
     flex-shrink:0;
@@ -179,24 +136,15 @@
   .title-wrap .sub{ font-size:11px; color:var(--text-low); margin-top:2px; letter-spacing:.3px; }
 
   .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
-
   .card{ padding:16px 14px; }
   .card-balance{ border-color:rgba(61,240,182,0.30); }
-  .card-balance::after{
-    content:""; position:absolute; inset:0; border-radius:20px; pointer-events:none;
-    box-shadow:inset 0 0 40px rgba(61,240,182,0.06);
-  }
+  .card-balance::after{ content:""; position:absolute; inset:0; border-radius:20px; pointer-events:none; box-shadow:inset 0 0 40px rgba(61,240,182,0.06); }
   .card-uid{ border-color:rgba(143,125,255,0.30); }
-  .card-uid::after{
-    content:""; position:absolute; inset:0; border-radius:20px; pointer-events:none;
-    box-shadow:inset 0 0 40px rgba(143,125,255,0.07);
-  }
+  .card-uid::after{ content:""; position:absolute; inset:0; border-radius:20px; pointer-events:none; box-shadow:inset 0 0 40px rgba(143,125,255,0.07); }
 
   .mini-icon{
-    width:32px; height:32px; border-radius:10px;
-    display:flex; align-items:center; justify-content:center; margin-bottom:10px;
-    border:1px solid var(--glass-border-soft);
-    position:relative; z-index:1;
+    width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    margin-bottom:10px; border:1px solid var(--glass-border-soft); position:relative; z-index:1;
   }
   .mini-icon svg{ width:16px; height:16px; }
   .mini-icon.mint{ background:rgba(61,240,182,0.14); }
@@ -204,14 +152,8 @@
   .mini-icon.iris{ background:rgba(143,125,255,0.16); }
   .mini-icon.iris svg{ color:#c8bfff; }
 
-  .card-label{
-    font-size:10.5px; font-weight:700; letter-spacing:.7px; color:var(--text-mid);
-    text-transform:uppercase; margin-bottom:4px; position:relative; z-index:1;
-  }
-  .card-value{
-    font-family:'Sora', sans-serif; font-size:19px; font-weight:700;
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; position:relative; z-index:1;
-  }
+  .card-label{ font-size:10.5px; font-weight:700; letter-spacing:.7px; color:var(--text-mid); text-transform:uppercase; margin-bottom:4px; position:relative; z-index:1; }
+  .card-value{ font-family:'Sora', sans-serif; font-size:19px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; position:relative; z-index:1; }
   .card-value.mint{ color:var(--mint); }
   .card-value.iris{ color:#c8bfff; }
   .card-value small{ font-size:11.5px; font-weight:600; color:var(--text-mid); margin-left:3px; }
@@ -232,9 +174,8 @@
   .service-grid{ display:grid; grid-template-columns:1fr 1px 1fr; align-items:center; position:relative; z-index:1; }
   .service-item{ display:flex; align-items:center; gap:12px; min-width:0; }
   .service-item .ic{
-    width:38px; height:38px; border-radius:11px;
-    background:rgba(92,147,255,0.14); border:1px solid var(--glass-border-soft);
-    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    width:38px; height:38px; border-radius:11px; background:rgba(92,147,255,0.14);
+    border:1px solid var(--glass-border-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0;
   }
   .service-item .ic svg{ width:17px; height:17px; color:var(--sapphire); }
   .service-item .lab{ font-size:10.5px; color:var(--text-mid); font-weight:700; letter-spacing:.4px; }
@@ -243,16 +184,10 @@
 
   .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; position:relative; z-index:1; }
   .stat-box{
-    border-radius:15px; padding:16px 10px; text-align:center;
-    border:1px solid var(--glass-border-soft);
-    background:rgba(255,255,255,0.04);
-    backdrop-filter:blur(10px);
+    border-radius:15px; padding:16px 10px; text-align:center; border:1px solid var(--glass-border-soft);
+    background:rgba(255,255,255,0.04); backdrop-filter:blur(10px);
   }
-  .stat-box .ic{
-    width:32px; height:32px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center; margin:0 auto 8px;
-    border:1px solid rgba(255,255,255,0.18);
-  }
+  .stat-box .ic{ width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; border:1px solid rgba(255,255,255,0.18); }
   .stat-box .ic svg{ width:15px; height:15px; color:#fff; }
   .stat-box .num{ font-family:'Sora', sans-serif; font-size:24px; font-weight:800; margin-bottom:4px; }
   .stat-box .lab{ font-size:10px; font-weight:700; letter-spacing:.3px; color:var(--text-mid); line-height:1.3; text-transform:uppercase; }
@@ -266,29 +201,29 @@
   .stat-rejected .ic{ background:rgba(255,122,147,0.35); }
   .stat-rejected .num{ color:#ffc0cd; }
 
-  .footer{
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-    padding:14px 16px; border-radius:16px; border-color:rgba(92,147,255,0.20);
-  }
+  .footer{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 16px; border-radius:16px; border-color:rgba(92,147,255,0.20); }
   .footer .thanks{ display:flex; align-items:center; gap:8px; color:#c6d6ff; font-weight:600; font-size:12px; position:relative; z-index:1; }
   .footer .thanks svg{ width:15px; height:15px; color:var(--aqua); flex-shrink:0; }
   .footer .time{ text-align:right; font-size:10px; color:var(--text-low); letter-spacing:.3px; text-transform:uppercase; position:relative; z-index:1; }
   .footer .time b{ display:block; font-size:12px; color:var(--text-mid); font-weight:700; margin-top:3px; text-transform:none; letter-spacing:0; }
 
-  .error-box{
-    display:none; text-align:center; padding:60px 20px; color:var(--text-mid);
-    flex-direction:column; align-items:center;
-  }
+  .error-box{ display:none; text-align:center; padding:60px 20px; color:var(--text-mid); flex-direction:column; align-items:center; }
   .error-box.show{ display:flex; }
   .error-box .ic{
-    width:54px; height:54px; border-radius:16px;
-    background:rgba(255,122,147,0.12); border:1px solid rgba(255,122,147,0.35);
-    display:flex; align-items:center; justify-content:center; margin-bottom:16px;
-    backdrop-filter:blur(10px);
+    width:54px; height:54px; border-radius:16px; background:rgba(255,122,147,0.12);
+    border:1px solid rgba(255,122,147,0.35); display:flex; align-items:center; justify-content:center;
+    margin-bottom:16px; backdrop-filter:blur(10px);
   }
   .error-box .ic svg{ width:24px; height:24px; color:var(--coral); }
   .error-box .t1{ font-family:'Sora', sans-serif; font-size:14.5px; font-weight:700; color:var(--text-hi); margin-bottom:6px; }
-  .error-box .t2{ font-size:12px; color:var(--text-low); max-width:280px; }
+  .error-box .t2{ font-size:12px; color:var(--text-low); max-width:280px; margin-bottom:16px; }
+  .error-box .retry-btn{
+    font-family:'Manrope', sans-serif; font-weight:700; font-size:12.5px; color:var(--text-hi);
+    padding:10px 22px; border-radius:12px; border:1px solid var(--glass-border);
+    background:linear-gradient(160deg, var(--glass-fill-hi), var(--glass-fill) 60%);
+    backdrop-filter:blur(14px); cursor:pointer;
+  }
+  .error-box .debug{ margin-top:14px; font-size:10px; color:var(--text-low); opacity:.7; word-break:break-all; max-width:300px; }
 
   @media (max-width:340px){
     .service-grid{ grid-template-columns:1fr; row-gap:16px; }
@@ -296,36 +231,21 @@
   }
 
   /* ---------- SHATTER SHARDS ---------- */
-  .shatter-layer{
-    position:fixed; inset:0; z-index:40; pointer-events:none; overflow:hidden;
+  .shatter-layer{ position:fixed; inset:0; z-index:70; pointer-events:none; overflow:hidden; }
+
+  .flash{
+    position:absolute; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.25) 40%, transparent 72%);
+    will-change:transform, opacity;
   }
   .shard{
     position:absolute;
-    width:26px; height:26px;
-    background:linear-gradient(140deg, rgba(255,255,255,0.55), rgba(255,255,255,0.08));
+    background:linear-gradient(140deg, rgba(255,255,255,0.6), rgba(255,255,255,0.05));
     border:1px solid rgba(255,255,255,0.55);
-    backdrop-filter:blur(2px);
-    box-shadow:0 2px 10px rgba(0,0,0,0.25), inset 0 0 6px rgba(255,255,255,0.4);
+    box-shadow:0 3px 14px rgba(0,0,0,0.30), inset 0 0 8px rgba(255,255,255,0.45);
     will-change:transform, opacity;
-    animation-timing-function:cubic-bezier(.16,1,.3,1);
-    animation-fill-mode:forwards;
   }
-  .crack-ring{
-    position:absolute;
-    border-radius:50%;
-    border:1.5px solid rgba(255,255,255,0.65);
-    will-change:transform, opacity;
-    animation:crackRing .55s ease-out forwards;
-  }
-  @keyframes crackRing{
-    0%{ transform:scale(0); opacity:0.9; }
-    100%{ transform:scale(1); opacity:0; }
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    .shard, .crack-ring{ animation:none !important; display:none; }
-    #content{ transition:none; }
-  }
+  .crack{ position:absolute; overflow:visible; }
 </style>
 </head>
 <body>
@@ -357,7 +277,7 @@
     </div>
   </div>
 
-  <div class="app">
+  <div class="app" id="appRoot">
     <div id="content">
 
       <div class="header glass">
@@ -470,6 +390,8 @@
       </div>
       <div class="t1">Unable to load account</div>
       <div class="t2">We couldn't fetch your data. Please try again or contact support.</div>
+      <button class="retry-btn" id="retryBtn">Try Again</button>
+      <div class="debug" id="debugMsg"></div>
     </div>
   </div>
 
@@ -479,19 +401,77 @@
   const FIREBASE_BASE = "https://ranger-shop-default-rtdb.firebaseio.com";
   const DB_PATH = "UsersAccountData";
 
+  /* ---------------------------------------------------------
+     Robust Telegram user-id detection.
+     Telegram's WebApp SDK can finish initialising a little
+     after DOMContentLoaded, and initDataUnsafe isn't always
+     populated the same way across clients, so we:
+       1) wait (poll) for window.Telegram.WebApp to exist
+       2) try initDataUnsafe.user.id
+       3) fall back to manually parsing the raw initData string
+       4) fall back to the tgWebAppData in the URL hash
+       5) fall back to a ?uid= query param (useful for testing
+          in a normal browser)
+  --------------------------------------------------------- */
+
+  function parseUserIdFromInitDataString(raw){
+    if(!raw) return null;
+    try{
+      const params = new URLSearchParams(raw);
+      const userStr = params.get("user");
+      if(userStr){
+        const user = JSON.parse(userStr);
+        if(user && user.id) return String(user.id);
+      }
+    }catch(e){}
+    return null;
+  }
+
   function getTelegramUserId(){
     try{
       const tg = window.Telegram && window.Telegram.WebApp;
       if(tg){
-        tg.ready();
-        tg.expand();
         const u = tg.initDataUnsafe && tg.initDataUnsafe.user;
         if(u && u.id) return String(u.id);
+
+        const fromInitData = parseUserIdFromInitDataString(tg.initData);
+        if(fromInitData) return fromInitData;
       }
     }catch(e){}
+
+    // fallback: parse tgWebAppData straight out of the URL hash
+    try{
+      const hash = window.location.hash ? window.location.hash.slice(1) : "";
+      const hashParams = new URLSearchParams(hash);
+      const tgData = hashParams.get("tgWebAppData");
+      const fromHash = parseUserIdFromInitDataString(tgData);
+      if(fromHash) return fromHash;
+    }catch(e){}
+
+    // fallback: explicit ?uid= for browser testing / debugging
     const params = new URLSearchParams(window.location.search);
     if(params.get("uid")) return params.get("uid");
+
     return null;
+  }
+
+  function waitForTelegramWebApp(maxWaitMs){
+    return new Promise((resolve)=>{
+      const started = Date.now();
+      (function poll(){
+        const tg = window.Telegram && window.Telegram.WebApp;
+        if(tg){
+          try{ tg.ready(); tg.expand(); }catch(e){}
+          resolve(tg);
+          return;
+        }
+        if(Date.now() - started >= maxWaitMs){
+          resolve(null);
+          return;
+        }
+        setTimeout(poll, 80);
+      })();
+    });
   }
 
   function formatBDTime(ts){
@@ -521,8 +501,7 @@
       const p = Math.min(1, (now - start) / duration);
       const eased = easeOutExpo(p);
       const cur = target * eased;
-      el.textContent = decimals > 0 ? cur.toFixed(decimals) : Math.round(cur).toString();
-      if(suffix) el.textContent += suffix;
+      el.textContent = (decimals > 0 ? cur.toFixed(decimals) : Math.round(cur).toString()) + suffix;
       if(p < 1) requestAnimationFrame(tick);
       else el.textContent = (decimals > 0 ? target.toFixed(decimals) : Math.round(target).toString()) + suffix;
     }
@@ -558,7 +537,6 @@
     loadPct.textContent = Math.round(loadProgress) + "%";
   }
 
-  // ease toward 90% while waiting for the network, then finish to 100% on data arrival
   let loadTimer = setInterval(()=>{
     if(loadDone) return;
     const remaining = 90 - loadProgress;
@@ -586,7 +564,6 @@
       document.getElementById("loading").classList.add("hide");
       document.getElementById("content").classList.add("show");
 
-      // count everything up together, the moment the glass content appears
       animateBalance(document.getElementById("balanceVal"), data.balance ?? 0);
 
       const rateEl = document.getElementById("rateVal");
@@ -603,8 +580,10 @@
     }, 380);
   }
 
-  function showError(){
+  function showError(reason){
     finishLoading();
+    const dbg = document.getElementById("debugMsg");
+    if(reason) dbg.textContent = reason;
     setTimeout(()=>{
       document.getElementById("loading").classList.add("hide");
       document.getElementById("content").style.display = "none";
@@ -613,81 +592,193 @@
   }
 
   async function loadAccount(){
+    setLoadProgress(8);
+
+    // give Telegram's SDK real time to attach the user info
+    await waitForTelegramWebApp(2500);
+
     const uid = getTelegramUserId();
-    if(!uid){ showError(); return; }
+    if(!uid){
+      showError("No Telegram user context found. Open this page from the bot's menu button or an inline Web App button.");
+      return;
+    }
+
     try{
       const res = await fetch(`${FIREBASE_BASE}/${DB_PATH}/${uid}.json`);
-      if(!res.ok) throw new Error("network");
+      if(!res.ok) throw new Error("HTTP " + res.status);
       const data = await res.json();
-      if(!data){ showError(); return; }
+      if(!data){
+        showError("No account record found for user ID " + uid + ".");
+        return;
+      }
       renderData(uid, data);
     }catch(err){
-      showError();
+      showError("Network error: " + (err && err.message ? err.message : "request failed"));
     }
   }
+
+  document.getElementById("retryBtn").addEventListener("click", ()=>{
+    document.getElementById("errorBox").classList.remove("show");
+    document.getElementById("content").style.display = "";
+    document.getElementById("loading").classList.remove("hide");
+    loadDone = false;
+    setLoadProgress(0);
+    loadTimer = setInterval(()=>{
+      if(loadDone) return;
+      const remaining = 90 - loadProgress;
+      setLoadProgress(loadProgress + Math.max(0.4, remaining * 0.06));
+    }, 60);
+    loadAccount();
+  });
 
   window.addEventListener("DOMContentLoaded", loadAccount);
 
-  /* ---------- click anywhere: glass shatter ---------- */
+  /* ---------- click anywhere: realistic glass shatter ---------- */
   const shatterLayer = document.getElementById("shatterLayer");
-  const SHARD_COLORS = [
-    "rgba(255,255,255,0.55)",
-    "rgba(143,125,255,0.35)",
-    "rgba(72,230,255,0.30)",
-    "rgba(61,240,182,0.28)"
+  const appRoot = document.getElementById("appRoot");
+  const SHARD_TINTS = [
+    "rgba(255,255,255,0.6)",
+    "rgba(143,125,255,0.4)",
+    "rgba(72,230,255,0.35)",
+    "rgba(61,240,182,0.32)",
+    "rgba(255,189,92,0.3)"
   ];
 
+  function rnd(min, max){ return min + Math.random() * (max - min); }
+
+  function spawnFlash(x, y){
+    const flash = document.createElement("div");
+    flash.className = "flash";
+    const size = 90;
+    flash.style.width = size + "px";
+    flash.style.height = size + "px";
+    flash.style.left = (x - size / 2) + "px";
+    flash.style.top = (y - size / 2) + "px";
+    shatterLayer.appendChild(flash);
+    const anim = flash.animate(
+      [{ transform: "scale(0.2)", opacity: 1 }, { transform: "scale(1.6)", opacity: 0 }],
+      { duration: 260, easing: "ease-out", fill: "forwards" }
+    );
+    anim.onfinish = () => flash.remove();
+  }
+
+  function spawnCracks(x, y){
+    const svgNS = "http://www.w3.org/2000/svg";
+    const size = 260;
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", "crack");
+    svg.setAttribute("width", size);
+    svg.setAttribute("height", size);
+    svg.style.left = (x - size / 2) + "px";
+    svg.style.top = (y - size / 2) + "px";
+    svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
+    const cx = size / 2, cy = size / 2;
+
+    const lineCount = 7 + Math.floor(Math.random() * 4);
+    for(let i = 0; i < lineCount; i++){
+      const angle = (Math.PI * 2 * i) / lineCount + rnd(-0.2, 0.2);
+      const len = rnd(50, size / 2 - 10);
+      let d = `M ${cx} ${cy}`;
+      let px = cx, py = cy;
+      const segs = 3 + Math.floor(Math.random() * 2);
+      for(let s = 1; s <= segs; s++){
+        const segLen = (len / segs) * s;
+        const jitter = rnd(-10, 10);
+        const nx = cx + Math.cos(angle) * segLen + Math.cos(angle + Math.PI / 2) * jitter;
+        const ny = cy + Math.sin(angle) * segLen + Math.sin(angle + Math.PI / 2) * jitter;
+        d += ` L ${nx} ${ny}`;
+        px = nx; py = ny;
+      }
+      const path = document.createElementNS(svgNS, "path");
+      path.setAttribute("d", d);
+      path.setAttribute("fill", "none");
+      path.setAttribute("stroke", "rgba(255,255,255,0.55)");
+      path.setAttribute("stroke-width", "1.1");
+      path.setAttribute("stroke-linecap", "round");
+      const pathLen = 120;
+      path.style.strokeDasharray = pathLen;
+      path.style.strokeDashoffset = pathLen;
+      svg.appendChild(path);
+      path.animate(
+        [{ strokeDashoffset: pathLen, opacity: 0.9 }, { strokeDashoffset: 0, opacity: 0.9 }],
+        { duration: 160, delay: i * 12, easing: "ease-out", fill: "forwards" }
+      );
+    }
+
+    shatterLayer.appendChild(svg);
+    setTimeout(()=>{
+      svg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 320, fill: "forwards" })
+        .onfinish = () => svg.remove();
+    }, 260);
+  }
+
   function shatterAt(x, y){
-    // expanding crack ring
-    const ring = document.createElement("div");
-    const ringSize = 140;
-    ring.className = "crack-ring";
-    ring.style.width = ringSize + "px";
-    ring.style.height = ringSize + "px";
-    ring.style.left = (x - ringSize / 2) + "px";
-    ring.style.top = (y - ringSize / 2) + "px";
-    shatterLayer.appendChild(ring);
-    ring.addEventListener("animationend", ()=> ring.remove());
+    spawnFlash(x, y);
+    spawnCracks(x, y);
 
-    const shardCount = 14 + Math.floor(Math.random() * 6);
-    for(let i = 0; i < shardCount; i++){
-      const shard = document.createElement("div");
-      shard.className = "shard";
+    // subtle shockwave through the glass surfaces
+    appRoot.style.filter = "brightness(1.15) blur(0.3px)";
+    setTimeout(()=> appRoot.style.filter = "", 180);
 
-      const size = 10 + Math.random() * 22;
-      shard.style.width = size + "px";
-      shard.style.height = size + "px";
-      shard.style.left = (x - size / 2) + "px";
-      shard.style.top = (y - size / 2) + "px";
-      shard.style.background = `linear-gradient(140deg, ${SHARD_COLORS[i % SHARD_COLORS.length]}, rgba(255,255,255,0.04))`;
-
-      // random irregular glass-shard polygon
-      const clip = `polygon(${rnd(0,30)}% ${rnd(0,20)}%, ${rnd(70,100)}% ${rnd(0,30)}%, ${rnd(80,100)}% ${rnd(70,100)}%, ${rnd(20,50)}% ${rnd(80,100)}%, ${rnd(0,20)}% ${rnd(40,70)}%)`;
-      shard.style.clipPath = clip;
-
-      const angle = Math.random() * Math.PI * 2;
-      const dist = 60 + Math.random() * 130;
-      const dx = Math.cos(angle) * dist;
-      const dy = Math.sin(angle) * dist - 20; // slight upward bias like glass catching light
-      const rot = (Math.random() * 540 - 270).toFixed(0);
-      const dur = 550 + Math.random() * 350;
-
-      shard.animate([
-        { transform: "translate(0,0) rotate(0deg) scale(1)", opacity: 1 },
-        { transform: `translate(${dx * 0.6}px, ${dy * 0.6}px) rotate(${rot * 0.6}deg) scale(0.9)`, opacity: 0.9, offset: 0.5 },
-        { transform: `translate(${dx}px, ${dy + 90}px) rotate(${rot}deg) scale(0.4)`, opacity: 0 }
-      ], {
-        duration: dur,
-        easing: "cubic-bezier(.16,1,.3,1)",
-        fill: "forwards"
-      });
-
-      shatterLayer.appendChild(shard);
-      setTimeout(()=> shard.remove(), dur + 60);
+    const ringCount = 3;
+    for(let r = 0; r < ringCount; r++){
+      const shardsInRing = 8 + r * 4;
+      const ringRadius = 18 + r * 34;
+      for(let i = 0; i < shardsInRing; i++){
+        createShard(x, y, ringRadius, r);
+      }
     }
   }
 
-  function rnd(min, max){ return Math.round(min + Math.random() * (max - min)); }
+  function createShard(x, y, ringRadius, ringIndex){
+    const shard = document.createElement("div");
+    shard.className = "shard";
+
+    const size = 8 + Math.random() * (20 - ringIndex * 3);
+    shard.style.width = size + "px";
+    shard.style.height = size + "px";
+    shard.style.left = (x - size / 2) + "px";
+    shard.style.top = (y - size / 2) + "px";
+    const tint = SHARD_TINTS[Math.floor(Math.random() * SHARD_TINTS.length)];
+    shard.style.background = `linear-gradient(140deg, ${tint}, rgba(255,255,255,0.03))`;
+
+    // jagged triangular / quad glass-shard silhouette
+    const points = 3 + (Math.random() < 0.5 ? 0 : 1);
+    let clip = "polygon(";
+    const coords = [];
+    for(let p = 0; p < points; p++){
+      const a = (Math.PI * 2 * p) / points + rnd(-0.3, 0.3);
+      const rad = rnd(35, 100);
+      const px = 50 + Math.cos(a) * rad;
+      const py = 50 + Math.sin(a) * rad;
+      coords.push(`${px.toFixed(0)}% ${py.toFixed(0)}%`);
+    }
+    clip += coords.join(",") + ")";
+    shard.style.clipPath = clip;
+
+    const angle = rnd(0, Math.PI * 2);
+    const burstDist = ringRadius + rnd(30, 90);
+    const dx = Math.cos(angle) * burstDist;
+    const dyOut = Math.sin(angle) * burstDist * 0.6 - rnd(10, 40); // initial upward/outward pop
+    const gravityFall = rnd(160, 320); // then falls with gravity
+    const rot = rnd(-420, 420);
+    const popDur = 220 + ringIndex * 40;
+    const fallDur = 480 + ringIndex * 60;
+    const totalDur = popDur + fallDur;
+
+    shard.animate([
+      { transform: "translate(0,0) rotate(0deg) scale(1)", opacity: 1, offset: 0 },
+      { transform: `translate(${dx}px, ${dyOut}px) rotate(${rot * 0.4}deg) scale(1)`, opacity: 1, offset: popDur / totalDur },
+      { transform: `translate(${dx * 1.15}px, ${dyOut + gravityFall}px) rotate(${rot}deg) scale(0.55)`, opacity: 0, offset: 1 }
+    ], {
+      duration: totalDur,
+      easing: "cubic-bezier(.25,.6,.3,1)",
+      fill: "forwards"
+    });
+
+    shatterLayer.appendChild(shard);
+    setTimeout(()=> shard.remove(), totalDur + 60);
+  }
 
   function handlePointer(e){
     const point = e.touches && e.touches[0] ? e.touches[0] : e;
