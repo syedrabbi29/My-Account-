@@ -47,11 +47,29 @@ body{
   align-items:center;
   padding:7px;
 
+  perspective:1300px;
+
   background:
     radial-gradient(circle at 12% 5%,rgba(139,107,255,.25),transparent 35%),
     radial-gradient(circle at 90% 8%,rgba(55,210,255,.16),transparent 32%),
     radial-gradient(circle at 50% 100%,rgba(139,107,255,.14),transparent 45%),
     #070711;
+
+  position:relative;
+}
+
+/* =========================
+   AMBIENT CIRCUIT BACKGROUND
+========================= */
+
+#fx-canvas{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:0;
+  opacity:.55;
+  pointer-events:none;
 }
 
 /* =========================
@@ -87,6 +105,16 @@ body{
   display:flex;
   flex-direction:column;
   gap:8px;
+
+  z-index:1;
+
+  transform-style:preserve-3d;
+  transition:transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease;
+  will-change:transform;
+}
+
+.console.tilting{
+  transition:transform .06s linear;
 }
 
 /* Ambient lights */
@@ -114,6 +142,28 @@ body{
   bottom:-110px;
   right:-70px;
   background:rgba(55,210,255,.12);
+}
+
+/* Glare sweep that follows tilt */
+
+.glare{
+  position:absolute;
+  inset:0;
+  z-index:40;
+  pointer-events:none;
+  border-radius:25px;
+  opacity:0;
+  transition:opacity .25s ease;
+  background:
+    radial-gradient(
+      circle at var(--gx,50%) var(--gy,50%),
+      rgba(255,255,255,.14),
+      transparent 42%
+    );
+}
+
+.console.tilting .glare{
+  opacity:1;
 }
 
 /* =========================
@@ -388,6 +438,30 @@ body{
   font-weight:850;
   letter-spacing:2px;
   text-shadow:0 0 15px rgba(139,107,255,.35);
+  cursor:pointer;
+  user-select:none;
+  transition:transform .15s ease, text-shadow .15s ease;
+  position:relative;
+}
+
+.id-number:active{
+  transform:scale(.96);
+}
+
+.id-number:hover{
+  text-shadow:0 0 20px rgba(139,107,255,.6);
+}
+
+.id-number:after{
+  content:"TAP TO COPY";
+  position:absolute;
+  left:0;
+  bottom:-11px;
+  font-size:5.5px;
+  letter-spacing:1px;
+  font-weight:700;
+  color:#777293;
+  white-space:nowrap;
 }
 
 .id-label{
@@ -423,6 +497,17 @@ body{
   padding:7px 10px;
 
   box-shadow:0 0 20px rgba(66,245,167,.05);
+  transition:box-shadow .4s ease, border-color .4s ease;
+}
+
+.status.pulse-in{
+  animation:statusPulseIn .7s ease;
+}
+
+@keyframes statusPulseIn{
+  0%{box-shadow:0 0 0 rgba(66,245,167,0)}
+  35%{box-shadow:0 0 34px rgba(66,245,167,.45)}
+  100%{box-shadow:0 0 20px rgba(66,245,167,.05)}
 }
 
 .status.inactive{
@@ -642,6 +727,16 @@ body{
   transform:translateY(-1px);
 }
 
+.stat-card.bump{
+  animation:cardBump .5s ease;
+}
+
+@keyframes cardBump{
+  0%{transform:scale(1)}
+  30%{transform:scale(1.045)}
+  100%{transform:scale(1)}
+}
+
 .stat-left{
   display:flex;
   align-items:center;
@@ -752,11 +847,12 @@ body{
 
   background:
     conic-gradient(
-      var(--purple) var(--health,70%),
+      var(--purple) var(--health,0%),
       rgba(255,255,255,.07) 0
     );
 
   box-shadow:0 0 18px rgba(139,107,255,.2);
+  transition:box-shadow .3s ease;
 }
 
 .ring:before{
@@ -883,6 +979,54 @@ body{
 }
 
 /* =========================
+   TOAST
+========================= */
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:26px;
+  z-index:999;
+
+  padding:9px 16px;
+
+  border-radius:999px;
+
+  background:rgba(20,18,40,.95);
+  border:1px solid rgba(139,107,255,.5);
+
+  color:#e9e5ff;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.3px;
+
+  box-shadow:0 8px 30px rgba(0,0,0,.5), 0 0 20px rgba(139,107,255,.35);
+
+  display:flex;
+  align-items:center;
+  gap:7px;
+
+  transform:translate(-50%,20px);
+  opacity:0;
+  pointer-events:none;
+  transition:transform .3s cubic-bezier(.22,1,.36,1), opacity .3s ease;
+}
+
+.toast.show{
+  transform:translate(-50%,0);
+  opacity:1;
+}
+
+.toast-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 8px var(--green);
+  flex-shrink:0;
+}
+
+/* =========================
    RESPONSIVE
 ========================= */
 
@@ -968,16 +1112,25 @@ body{
   .boot-scan{
     display:none;
   }
+
+  .console{
+    transform:none!important;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="console">
+<canvas id="fx-canvas"></canvas>
+
+<div class="console" id="console">
 
   <!-- Initial security scan -->
   <div class="boot-scan"></div>
+
+  <!-- Tilt glare -->
+  <div class="glare"></div>
 
   <!-- HEADER -->
   <div class="top">
@@ -1097,7 +1250,7 @@ body{
     <div class="stats">
 
       <!-- Approved -->
-      <div class="stat-card green">
+      <div class="stat-card green" id="card-approved">
 
         <div class="stat-left">
 
@@ -1117,7 +1270,7 @@ body{
 
 
       <!-- Rejected -->
-      <div class="stat-card red">
+      <div class="stat-card red" id="card-rejected">
 
         <div class="stat-left">
 
@@ -1137,7 +1290,7 @@ body{
 
 
       <!-- Pending -->
-      <div class="stat-card orange">
+      <div class="stat-card orange" id="card-pending">
 
         <div class="stat-left">
 
@@ -1330,6 +1483,12 @@ body{
 
   </div>
 
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-dot"></span>
+  <span id="toast-text">Copied</span>
 </div>
 
 
@@ -1603,8 +1762,54 @@ function calculateHealth(
 
 
 /* =========================================
-   UPDATE HEALTH
+   EASING
 ========================================= */
+
+function easeOutCubic(t){
+  return 1 - Math.pow(1 - t, 3);
+}
+
+
+/* =========================================
+   ANIMATE COUNT (generic, used for stat cards)
+========================================= */
+
+function animateCount(el, from, to, duration, suffix){
+
+  if(!el) return;
+
+  suffix = suffix || "";
+
+  var start = null;
+
+  function step(ts){
+
+    if(start === null) start = ts;
+
+    var progress = Math.min(1, (ts - start) / duration);
+    var eased = easeOutCubic(progress);
+    var value = Math.round(from + (to - from) * eased);
+
+    el.textContent = value + suffix;
+
+    if(progress < 1){
+      requestAnimationFrame(step);
+    }else{
+      el.textContent = to + suffix;
+    }
+
+  }
+
+  requestAnimationFrame(step);
+
+}
+
+
+/* =========================================
+   UPDATE HEALTH (animated ring + number)
+========================================= */
+
+var __currentHealth = 0;
 
 function updateHealth(
   approved,
@@ -1624,19 +1829,41 @@ function updateHealth(
       "health-ring"
     );
 
-  if(ring){
-
-    ring.style.setProperty(
-      "--health",
-      health + "%"
+  var numberEl =
+    document.getElementById(
+      "health-number"
     );
+
+  var fromHealth = __currentHealth;
+  var toHealth = health;
+  var start = null;
+  var duration = 900;
+
+  function step(ts){
+
+    if(start === null) start = ts;
+
+    var progress = Math.min(1, (ts - start) / duration);
+    var eased = easeOutCubic(progress);
+    var current = fromHealth + (toHealth - fromHealth) * eased;
+
+    if(ring){
+      ring.style.setProperty("--health", current + "%");
+    }
+
+    if(numberEl){
+      numberEl.textContent = Math.round(current) + "%";
+    }
+
+    if(progress < 1){
+      requestAnimationFrame(step);
+    }else{
+      __currentHealth = toHealth;
+    }
 
   }
 
-  setText(
-    "health-number",
-    health + "%"
-  );
+  requestAnimationFrame(step);
 
 
   var label =
@@ -1662,6 +1889,294 @@ function updateHealth(
     "health-label",
     label
   );
+
+}
+
+
+/* =========================================
+   TOAST
+========================================= */
+
+var __toastTimer = null;
+
+function showToast(message){
+
+  var toast = document.getElementById("toast");
+  var text = document.getElementById("toast-text");
+
+  if(!toast) return;
+
+  if(text) text.textContent = message;
+
+  toast.classList.add("show");
+
+  clearTimeout(__toastTimer);
+
+  __toastTimer = setTimeout(function(){
+    toast.classList.remove("show");
+  }, 1800);
+
+}
+
+
+/* =========================================
+   COPY TO CLIPBOARD
+========================================= */
+
+function copyText(value){
+
+  if(!value || value === "—") return;
+
+  try{
+
+    if(navigator.clipboard && navigator.clipboard.writeText){
+
+      navigator.clipboard.writeText(value)
+        .then(function(){ showToast("ID copied to clipboard"); })
+        .catch(function(){ fallbackCopy(value); });
+
+    }else{
+
+      fallbackCopy(value);
+
+    }
+
+  }catch(e){
+
+    fallbackCopy(value);
+
+  }
+
+}
+
+function fallbackCopy(value){
+
+  try{
+
+    var ta = document.createElement("textarea");
+    ta.value = value;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    showToast("ID copied to clipboard");
+
+  }catch(e){}
+
+}
+
+
+/* =========================================
+   SOFT CHIME (Web Audio, no assets)
+========================================= */
+
+var __audioCtx = null;
+
+function playChime(){
+
+  try{
+
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    if(!Ctx) return;
+
+    if(!__audioCtx) __audioCtx = new Ctx();
+
+    var ctx = __audioCtx;
+    var now = ctx.currentTime;
+
+    [660, 990].forEach(function(freq, i){
+
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.value = freq;
+
+      var t0 = now + i * 0.09;
+
+      gain.gain.setValueAtTime(0, t0);
+      gain.gain.linearRampToValueAtTime(0.05, t0 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.35);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(t0);
+      osc.stop(t0 + 0.4);
+
+    });
+
+  }catch(e){}
+
+}
+
+
+/* =========================================
+   3D TILT EFFECT
+========================================= */
+
+function initTilt(){
+
+  var el = document.getElementById("console");
+  var glare = document.querySelector(".glare");
+
+  if(!el) return;
+
+  var rect = null;
+  var raf = null;
+
+  function onMove(clientX, clientY){
+
+    rect = el.getBoundingClientRect();
+
+    var px = (clientX - rect.left) / rect.width;
+    var py = (clientY - rect.top) / rect.height;
+
+    var rotateY = (px - 0.5) * 12;
+    var rotateX = (0.5 - py) * 10;
+
+    if(raf) cancelAnimationFrame(raf);
+
+    raf = requestAnimationFrame(function(){
+
+      el.classList.add("tilting");
+
+      el.style.transform =
+        "perspective(1200px) rotateX(" + rotateX + "deg) rotateY(" + rotateY + "deg) scale3d(1.012,1.012,1.012)";
+
+      if(glare){
+        glare.style.setProperty("--gx", (px * 100) + "%");
+        glare.style.setProperty("--gy", (py * 100) + "%");
+      }
+
+    });
+
+  }
+
+  function reset(){
+
+    el.classList.remove("tilting");
+    el.style.transform = "perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)";
+
+  }
+
+  document.addEventListener("mousemove", function(e){
+    onMove(e.clientX, e.clientY);
+  });
+
+  document.addEventListener("mouseleave", reset);
+
+  el.addEventListener("touchmove", function(e){
+    if(e.touches && e.touches[0]){
+      onMove(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive:true });
+
+  el.addEventListener("touchend", reset);
+
+  window.addEventListener("blur", reset);
+
+}
+
+
+/* =========================================
+   AMBIENT CIRCUIT BACKGROUND
+========================================= */
+
+function initBackgroundFx(){
+
+  var canvas = document.getElementById("fx-canvas");
+  if(!canvas) return;
+
+  var ctx = canvas.getContext("2d");
+  var w, h, nodes = [];
+  var NODE_COUNT = 34;
+  var MAX_DIST = 130;
+
+  var colors = ["139,107,255", "85,217,255"];
+
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+
+  function makeNodes(){
+
+    nodes = [];
+
+    for(var i=0; i<NODE_COUNT; i++){
+
+      nodes.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.18,
+        vy: (Math.random() - 0.5) * 0.18,
+        r: Math.random() * 1.4 + 0.6,
+        c: colors[i % colors.length]
+      });
+
+    }
+
+  }
+
+  function step(){
+
+    ctx.clearRect(0, 0, w, h);
+
+    for(var i=0; i<nodes.length; i++){
+
+      var n = nodes[i];
+
+      n.x += n.vx;
+      n.y += n.vy;
+
+      if(n.x < 0 || n.x > w) n.vx *= -1;
+      if(n.y < 0 || n.y > h) n.vy *= -1;
+
+      for(var j=i+1; j<nodes.length; j++){
+
+        var m = nodes[j];
+        var dx = n.x - m.x;
+        var dy = n.y - m.y;
+        var dist = Math.sqrt(dx*dx + dy*dy);
+
+        if(dist < MAX_DIST){
+
+          var alpha = (1 - dist / MAX_DIST) * 0.16;
+
+          ctx.strokeStyle = "rgba(" + n.c + "," + alpha + ")";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(n.x, n.y);
+          ctx.lineTo(m.x, m.y);
+          ctx.stroke();
+
+        }
+
+      }
+
+      ctx.fillStyle = "rgba(" + n.c + ",0.55)";
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fill();
+
+    }
+
+    requestAnimationFrame(step);
+
+  }
+
+  resize();
+  makeNodes();
+  requestAnimationFrame(step);
+
+  window.addEventListener("resize", function(){
+    resize();
+    makeNodes();
+  });
 
 }
 
@@ -1764,6 +2279,11 @@ function setActiveUI(isActive){
 
     if(verification)
       verification.classList.remove("off");
+
+
+    statusBar.classList.remove("pulse-in");
+    void statusBar.offsetWidth;
+    statusBar.classList.add("pulse-in");
 
   }
 
@@ -2012,27 +2532,19 @@ function renderActiveState(
   );
 
 
-  /* VALUES */
+  /* VALUES (animated count-up) */
 
-  setText(
-    "row-approved",
-    String(approved)
-  );
+  var approvedEl = document.getElementById("row-approved");
+  var rejectedEl = document.getElementById("row-rejected");
+  var pendingEl = document.getElementById("row-pending");
+  var balanceEl = document.getElementById("row-balance");
+  var submittedEl = document.getElementById("row-total-submitted");
 
-  setText(
-    "row-rejected",
-    String(rejected)
-  );
-
-  setText(
-    "row-pending",
-    String(pending)
-  );
-
-  setText(
-    "row-balance",
-    String(balance)
-  );
+  animateCount(approvedEl, 0, approved, 800, "");
+  animateCount(rejectedEl, 0, rejected, 800, "");
+  animateCount(pendingEl, 0, pending, 800, "");
+  animateCount(balanceEl, 0, balance, 900, "");
+  animateCount(submittedEl, 0, totalSubmitted, 900, "");
 
   setText(
     "row-rate",
@@ -2047,10 +2559,28 @@ function renderActiveState(
       .replace(/\s*Hours?/i,"h")
   );
 
-  setText(
-    "row-total-submitted",
-    String(totalSubmitted)
-  );
+
+  /* Bump animation on stat cards that have data */
+
+  [
+    ["card-approved", approved],
+    ["card-rejected", rejected],
+    ["card-pending", pending]
+  ].forEach(function(pair){
+
+    if(pair[1] > 0){
+
+      var card = document.getElementById(pair[0]);
+
+      if(card){
+        card.classList.remove("bump");
+        void card.offsetWidth;
+        card.classList.add("bump");
+      }
+
+    }
+
+  });
 
 
   /* HEALTH */
@@ -2097,6 +2627,11 @@ function renderActiveState(
 
   }
 
+
+  /* Soft confirmation chime once data is in */
+
+  playChime();
+
 }
 
 
@@ -2105,6 +2640,20 @@ function renderActiveState(
 ========================================= */
 
 function init(){
+
+  initTilt();
+  initBackgroundFx();
+
+  var pill = document.getElementById("pill-user-id");
+
+  if(pill){
+
+    pill.addEventListener("click", function(){
+      copyText(pill.textContent.trim());
+    });
+
+  }
+
 
   var userId =
     getUserIdFromUrl();
